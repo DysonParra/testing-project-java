@@ -21,17 +21,15 @@ apply plugin: "io.spring.dependency-management"
 apply plugin: 'maven'
 apply plugin: 'signing'
 
+group = 'io.github.dysonparra'
+archivesBaseName = "${archivesBaseName}".replaceAll("-java", "")
+version = '0.5.5-SNAPSHOT'
+
 def rootPackage = 'com.project.dev'
-def projectName = "${projectDir}".split('\\\\|/')
-projectName = projectName[projectName.size()-1]
 def rootDir = "${rootPackage}".replaceAll("\\.", "/")
 def mainClass = "${rootPackage}.Application"
 def mainFile = "${mainClass}".replaceAll("\\.", "/")
 def gitUser = "DysonParra"
-
-group = 'io.github.dysonparra'
-archivesBaseName = "${projectName}"
-version = '0.5-SNAPSHOT'
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
@@ -85,11 +83,15 @@ task fatJarLib(type: Jar) {
 
 task javadocJar(type: Jar) {
     classifier = 'javadoc'
+    exclude "${mainFile}.class"
+    exclude "${rootDir}/tester"
     from javadoc
 }
 
 task sourcesJar(type: Jar) {
     classifier = 'sources'
+    exclude "${mainFile}.class"
+    exclude "${rootDir}/tester"
     from sourceSets.main.allSource
 }
 
@@ -98,7 +100,8 @@ artifacts {
     archives fatJar
     archives jarLib
     archives fatJarLib
-    archives javadocJar, sourcesJar
+    archives javadocJar
+    archives sourcesJar
 }
 
 processResources {
@@ -173,17 +176,17 @@ uploadArchives {
                 authentication(userName: ossrhUsername, password: ossrhPassword)
             }
             pom.project {
-                name = "${projectName}"
+                name = "${archivesBaseName}"
                 group = "${group}"
-                artifactId = "${projectName}"
+                artifactId = "${archivesBaseName}"
                 version = "${version}"
                 description = 'TODO: Library description'
-                url = "https://github.com/${gitUser}/${projectName}"
+                url = "https://github.com/${gitUser}/${archivesBaseName}"
                 packaging 'jar'
                 scm {
-                    connection = "scm:git:git://${gitUser}/${projectName}.git"
-                    developerConnection = "scm:git:git://${gitUser}/${projectName}.git"
-                    url = "https://github.com/${gitUser}/${projectName}/tree/master"
+                    connection = "scm:git:git://${gitUser}/${archivesBaseName}.git"
+                    developerConnection = "scm:git:git://${gitUser}/${archivesBaseName}.git"
+                    url = "https://github.com/${gitUser}/${archivesBaseName}/tree/master"
                 }
                 licenses {
                     license {
