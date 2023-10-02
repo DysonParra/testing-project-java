@@ -23,7 +23,7 @@ apply plugin: 'signing'
 
 group = 'io.github.dysonparra'
 archivesBaseName = "${archivesBaseName}".replaceAll("-java", "")
-version = '0.5.5-SNAPSHOT'
+version = '0.6.1-SNAPSHOT'
 
 def rootPackage = 'com.project.dev'
 def rootDir = "${rootPackage}".replaceAll("\\.", "/")
@@ -37,6 +37,10 @@ tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
+application {
+    mainClassName = "${mainClass}"
+}
+
 jar {
     classifier = 'min'
     manifest {
@@ -46,12 +50,8 @@ jar {
     }
 }
 
-application {
-    mainClassName = "${mainClass}"
-}
-
 task fatJar(type: Jar) {
-    //classifier = ''
+    classifier = ''
     manifest.from jar.manifest
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from {
@@ -135,6 +135,10 @@ configurations {
     }
     compileOnly {
         extendsFrom annotationProcessor
+    }
+    archives.artifacts.removeAll {
+        def depTasks = it.getBuildDependencies().getDependencies()
+        depTasks.contains(distZip) || depTasks.contains(distTar)  
     }
 }
 
